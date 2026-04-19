@@ -1,15 +1,22 @@
 import dotenv from "dotenv";
-import mongoose from "mongoose";
-import app from "./src/app.js";
-import { MONGO_URI,PORT } from "./src/constants/env.js";
-dotenv.config();
+dotenv.config(); // 🔥 MUST BE FIRST
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    console.log("DB Connected");
-    app.listen(PORT || 5000 , () =>
-      console.log(`Server running on port ${PORT}`)
-    );
-  })
-  .catch((err) => console.error(err));
+import app from "./src/app.js";
+import connectDB from "./src/config/db.js";
+
+const PORT = process.env.PORT || 5000;
+
+const startServer = async () => {
+  try {
+    await connectDB(); // wait for DB connection
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
+  } catch (error) {
+    console.error("Server start failed:", error.message);
+  }
+};
+
+startServer();

@@ -1,18 +1,23 @@
-import express from "express";
-import { TaskController } from "../controller/task.controller.js";
-import { TaskRepository } from "../repository/task.repository.js"
-import { TaskService } from "../services/task.service.js"
-
+const express = require("express");
 const router = express.Router();
+const {
+  createTask,
+  updateTask,
+  deleteTask,
+  moveTask,
+  getListTasks,
+} = require("../controllers/TaskController");
+const { protect } = require("../middleware/auth.middleware");
 
-// Inject dependencies
-const taskRepository = new TaskRepository();
-const taskService = new TaskService(taskRepository);
-const taskController = new TaskController(taskService);
+router.use(protect);
 
-router.get("/", taskController.getTasks);
-router.post("/", taskController.createTask);
-router.put("/:id", taskController.updateTask);
-router.delete("/:id", taskController.deleteTask);
+// List-scoped
+router.get("/list/:listId", getListTasks);
+router.post("/list/:listId", createTask);
 
-export default router;
+// Task-specific
+router.patch("/:id", updateTask);
+router.delete("/:id", deleteTask);
+router.patch("/:id/move", moveTask);
+
+module.exports = router;
